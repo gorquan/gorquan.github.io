@@ -1,0 +1,273 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Vmware Esxi 6.7.0 安装部署 | gorquan's Blog</title><meta name="description" content="上学期上虚拟化与云计算做大作业的时候,有幸接触了 VMware ESXi 的安装,现在在自己的 blog 记录一下 大纲 安装 Vmware Esxi 6.7.0 附加驱动到 VMware ESXi 安装光盘 准备工作 在线添加驱动 离线添加驱动   后记  安装 Vmware ESXi 6.7.0 将 ESXi 刻录到 U 盘,然后插入 U 盘,从 U 盘启动 ESXi 安装程序     按 E"><meta name="keywords" content="Linux,Esxi"><meta name="author" content="gorquan"><meta name="copyright" content="gorquan"><meta name="format-detection" content="telephone=no"><link rel="shortcut icon" href="https://gorquan-blogs-picture-1251930375.cos.ap-guangzhou.myqcloud.com/avatar.png"><meta http-equiv="Cache-Control" content="no-transform"><meta http-equiv="Cache-Control" content="no-siteapp"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="dns-prefetch" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="https://www.google-analytics.com" crossorigin="crossorigin"/><link rel="dns-prefetch" href="https://www.google-analytics.com"/><link rel="preconnect" href="https://fonts.googleapis.com" crossorigin="crossorigin"/><link rel="dns-prefetch" href="https://fonts.googleapis.com"/><meta name="twitter:card" content="summary"><meta name="twitter:title" content="Vmware Esxi 6.7.0 安装部署"><meta name="twitter:description" content="上学期上虚拟化与云计算做大作业的时候,有幸接触了 VMware ESXi 的安装,现在在自己的 blog 记录一下 大纲 安装 Vmware Esxi 6.7.0 附加驱动到 VMware ESXi 安装光盘 准备工作 在线添加驱动 离线添加驱动   后记  安装 Vmware ESXi 6.7.0 将 ESXi 刻录到 U 盘,然后插入 U 盘,从 U 盘启动 ESXi 安装程序     按 E"><meta name="twitter:image" content="https://gorquan-blogs-picture-1251930375.cos.ap-guangzhou.myqcloud.com/vmw.png"><meta property="og:type" content="article"><meta property="og:title" content="Vmware Esxi 6.7.0 安装部署"><meta property="og:url" content="http://blog.gorquan.cn/2019/08/01/yuque/Vmware%20Esxi%206.7.0%20%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"><meta property="og:site_name" content="gorquan's Blog"><meta property="og:description" content="上学期上虚拟化与云计算做大作业的时候,有幸接触了 VMware ESXi 的安装,现在在自己的 blog 记录一下 大纲 安装 Vmware Esxi 6.7.0 附加驱动到 VMware ESXi 安装光盘 准备工作 在线添加驱动 离线添加驱动   后记  安装 Vmware ESXi 6.7.0 将 ESXi 刻录到 U 盘,然后插入 U 盘,从 U 盘启动 ESXi 安装程序     按 E"><meta property="og:image" content="https://gorquan-blogs-picture-1251930375.cos.ap-guangzhou.myqcloud.com/vmw.png"><meta property="article:published_time" content="2019-08-01T08:18:07.000Z"><meta property="article:modified_time" content="2021-06-10T03:05:15.476Z"><script src="https://cdn.jsdelivr.net/npm/js-cookie/dist/js.cookie.min.js"></script><script>var autoChangeMode = '1'
+var t = Cookies.get("theme")
+if (autoChangeMode == '1'){
+  var isDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches
+  var isLightMode = window.matchMedia("(prefers-color-scheme: light)").matches
+  var isNotSpecified = window.matchMedia("(prefers-color-scheme: no-preference)").matches
+  var hasNoSupport = !isDarkMode && !isLightMode && !isNotSpecified
+
+  if (t === undefined){
+    if (isLightMode) activateLightMode()
+    else if (isDarkMode) activateDarkMode()
+    else if (isNotSpecified || hasNoSupport){
+      console.log('You specified no preference for a color scheme or your browser does not support it. I Schedule dark mode during night time.')
+      var now = new Date()
+      var hour = now.getHours()
+      var isNight = hour < 6 || hour >= 18
+      isNight ? activateDarkMode() : activateLightMode()
+  }
+  } else if (t == 'light') activateLightMode()
+  else activateDarkMode()
+
+} else if (autoChangeMode == '2'){
+  now = new Date();
+  hour = now.getHours();
+  isNight = hour < 6 || hour >= 18
+  if(t === undefined) isNight? activateDarkMode() : activateLightMode()
+  else if (t === 'light') activateLightMode()
+  else activateDarkMode() 
+} else {
+  if ( t == 'dark' ) activateDarkMode()
+  else if ( t == 'light') activateLightMode()
+}
+
+function activateDarkMode(){
+  document.documentElement.setAttribute('data-theme', 'dark')
+  if (document.querySelector('meta[name="theme-color"]') !== null){
+    document.querySelector('meta[name="theme-color"]').setAttribute('content','#000')
+  }
+}
+function activateLightMode(){
+  document.documentElement.setAttribute('data-theme', 'light')
+  if (document.querySelector('meta[name="theme-color"]') !== null){
+  document.querySelector('meta[name="theme-color"]').setAttribute('content','#fff')
+  }
+}</script><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@latest/css/font-awesome.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.css"><link rel="canonical" href="http://blog.gorquan.cn/2019/08/01/yuque/Vmware%20Esxi%206.7.0%20%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/"><link rel="prev" title="luci debug" href="http://blog.gorquan.cn/2019/08/13/yuque/luci%20debug/"><link rel="next" title="Requests模块使用I 获取短链接真实地址" href="http://blog.gorquan.cn/2019/08/01/yuque/Requests%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8I%20%E8%8E%B7%E5%8F%96%E7%9F%AD%E9%93%BE%E6%8E%A5%E7%9C%9F%E5%AE%9E%E5%9C%B0%E5%9D%80/"><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-133966066-1', 'auto');
+ga('send', 'pageview');
+</script><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Titillium+Web"><script>var GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":2,"translateDelay":0,"cookieDomain":"https://blogs.gorquan.cn/","msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  bookmark: {
+    message_prev: '按',
+    message_next: '键将本页加入书签'
+  },
+  runtime_unit: '天',
+  runtime: true,
+  copyright: {"languages":{"author":"作者: gorquan","link":"链接: ","source":"来源: gorquan's Blog","info":"著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。"}},
+  ClickShowText: undefined,
+  medium_zoom: false,
+  fancybox: true,
+  Snackbar: {"bookmark":{"message_prev":"按","message_next":"键将本页加入书签"},"chs_to_cht":"你已切换为繁体","cht_to_chs":"你已切换为简体","day_to_night":"你已切换为深色模式","night_to_day":"你已切换为浅色模式","bgLight":"#49b1f5","bgDark":"#2d3035","position":"bottom-right"},
+  baiduPush: false,
+  highlightCopy: true,
+  highlightLang: true,
+  highlightShrink: 'false',
+  isFontAwesomeV5: false,
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isanchor: false
+  
+}</script><script>var GLOBAL_CONFIG_SITE = { 
+  isPost: true,
+  isHome: false,
+  isSidebar: true  
+  }</script><noscript><style>
+#page-header {
+  opacity: 1
+}
+.justified-gallery img{
+  opacity: 1
+}
+</style></noscript><meta name="referrer" content="no-referrer" /><meta name="generator" content="Hexo 5.0.0"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><canvas class="fireworks"></canvas><div id="mobile-sidebar"><div id="menu_mask"></div><div id="mobile-sidebar-menus"><div class="mobile_author_icon"><img class="avatar-img" src="https://gorquan-blogs-picture-1251930375.cos.ap-guangzhou.myqcloud.com/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="mobile_post_data"><div class="mobile_data_item is-center"><div class="mobile_data_link"><a href="/archives/"><div class="headline">文章</div><div class="length_num">23</div></a></div></div><div class="mobile_data_item is-center">      <div class="mobile_data_link"><a href="/tags/"><div class="headline">标签</div><div class="length_num">22</div></a></div></div><div class="mobile_data_item is-center">     <div class="mobile_data_link"><a href="/categories/"><div class="headline">分类</div><div class="length_num">24</div></a></div></div></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> About</span></a></div></div></div></div><i class="fa fa-arrow-right on" id="toggle-sidebar" aria-hidden="true">     </i><div id="sidebar"><div class="sidebar-toc"><div class="sidebar-toc__title">目录</div><div class="sidebar-toc__progress"><span class="progress-notice">你已经读了</span><span class="progress-num">0</span><span class="progress-percentage">%</span><div class="sidebar-toc__progress-bar">     </div></div><div class="sidebar-toc__content"><ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%A7%E7%BA%B2"><span class="toc-number">1.</span> <span class="toc-text">大纲</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-Vmware-ESXi-6-7-0"><span class="toc-number">1.1.</span> <span class="toc-text">安装 Vmware ESXi 6.7.0</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%99%84%E5%8A%A0%E9%A9%B1%E5%8A%A8%E5%88%B0-VMware-ESXi-%E5%AE%89%E8%A3%85%E5%85%89%E7%9B%98"><span class="toc-number">1.2.</span> <span class="toc-text">附加驱动到 VMware ESXi  安装光盘</span></a><ol class="toc-child"><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%87%86%E5%A4%87%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.2.1.</span> <span class="toc-text">准备步骤</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E5%9C%A8%E7%BA%BF%E6%B7%BB%E5%8A%A0%E9%A9%B1%E5%8A%A8"><span class="toc-number">1.2.2.</span> <span class="toc-text">在线添加驱动</span></a></li><li class="toc-item toc-level-6"><a class="toc-link" href="#%E7%A6%BB%E7%BA%BF%E6%B7%BB%E5%8A%A0%E9%A9%B1%E5%8A%A8"><span class="toc-number">1.2.3.</span> <span class="toc-text">离线添加驱动</span></a></li></ol></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%90%8E%E8%AE%B0"><span class="toc-number">1.3.</span> <span class="toc-text">后记</span></a></li></ol></li></ol></div></div></div><div id="body-wrap"><div class="post-bg" id="nav" style="background-image: url(https://gorquan-blogs-picture-1251930375.cos.ap-guangzhou.myqcloud.com/vmw.png)"><div id="page-header"><span class="pull_left" id="blog_name"><a class="blog_title" id="site-name" href="/">gorquan's Blog</a></span><span class="pull_right menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fa fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fa fa-heart"></i><span> About</span></a></div></div><span class="toggle-menu close"><a class="site-page"><i class="fa fa-bars fa-fw" aria-hidden="true"></i></a></span></span></div><div id="post-info"><div id="post-title"><div class="posttitle">Vmware Esxi 6.7.0 安装部署</div></div><div id="post-meta"><div class="meta-firstline"><time class="post-meta__date" title="发表于 2019-08-01 16:18:07"><i class="fa fa-calendar" aria-hidden="true"></i> 发表于 2019-08-01</time><span class="post-meta__categories"><span class="post-meta__separator">|</span><i class="fa fa-inbox post-meta__icon" aria-hidden="true"></i><a class="post-meta__categories" href="/categories/Linux/">Linux</a><i class="fa fa-angle-right post-meta__separator" aria-hidden="true"></i><i class="fa fa-inbox post-meta__icon" aria-hidden="true"></i><a class="post-meta__categories" href="/categories/Linux/Esxi/">Esxi</a></span></div><div class="meta-secondline"> <span class="post-meta-wordcount"><i class="post-meta__icon fa fa-file-word-o" aria-hidden="true"></i><span>字数总计:</span><span class="word-count">1.8k</span><span class="post-meta__separator">|</span><i class="post-meta__icon fa fa-clock-o" aria-hidden="true"></i><span>阅读时长: 6 分钟</span></span></div><div class="meta-thirdline"><span class="post-meta-pv-cv"></span><span class="post-meta-commentcount"></span></div></div></div></div><main class="layout_post" id="content-inner"><article id="post"><div class="post-content" id="article-container"><p>上学期上虚拟化与云计算做大作业的时候,有幸接触了 VMware ESXi 的安装,现在在自己的 blog 记录一下</p>
+<h4 id="大纲"><a href="#大纲" class="headerlink" title="大纲"></a>大纲</h4><ol>
+<li><a href="#tjZ9J">安装 Vmware Esxi 6.7.0</a></li>
+<li><a href="#a2a3Z">附加驱动到 VMware ESXi 安装光盘</a><ol>
+<li><a href="#u0r23">准备工作</a></li>
+<li><a href="#oKr8O">在线添加驱动</a></li>
+<li><a href="#GpIbS">离线添加驱动</a></li>
+</ol>
+</li>
+<li><a href="#TzeCw">后记</a></li>
+</ol>
+<h5 id="安装-Vmware-ESXi-6-7-0"><a href="#安装-Vmware-ESXi-6-7-0" class="headerlink" title="安装 Vmware ESXi 6.7.0"></a>安装 Vmware ESXi 6.7.0</h5><ol>
+<li>将 ESXi 刻录到 U 盘,然后插入 U 盘,从 U 盘启动 ESXi 安装程序</li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566145405951-62d4a680-d874-4f06-95fe-f2f0b2809aa8.png#align=left&display=inline&height=322&margin=%5Bobject%20Object%5D&name=image.png&originHeight=322&originWidth=602&size=14112&status=done&style=none&width=602" alt="image.png"></p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566145412072-23e2becb-b3a5-47e7-a246-eb07e56b25c7.png#align=left&display=inline&height=452&margin=%5Bobject%20Object%5D&name=image.png&originHeight=452&originWidth=606&size=17897&status=done&style=none&width=606" alt="image.png"></p>
+<ol start="2">
+<li>按 <code>Enter</code>  进行安装</li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566145442829-fd3df4a8-0957-4652-a7cc-f65074fcb282.png#align=left&display=inline&height=454&margin=%5Bobject%20Object%5D&name=image.png&originHeight=454&originWidth=607&size=22978&status=done&style=none&width=607" alt="image.png"></p>
+<ol start="3">
+<li>按 <code>F11</code>  同意协议</li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566145477697-a4e33869-94b8-44f0-9d39-d81f977f0791.png#align=left&display=inline&height=452&margin=%5Bobject%20Object%5D&name=image.png&originHeight=452&originWidth=602&size=42085&status=done&style=none&width=602" alt="image.png"></p>
+<ol start="4">
+<li>选择语言,按 <code>Enter</code>  继续安装,此处选择 <code>US Default</code></li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566145502477-8f5a6d13-f13d-4e63-afc8-b198ebfbb072.png#align=left&display=inline&height=450&margin=%5Bobject%20Object%5D&name=image.png&originHeight=450&originWidth=606&size=19195&status=done&style=none&width=606" alt="image.png"></p>
+<ol start="5">
+<li>设置密码,按 <code>Enter</code>  继续</li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566145548799-037ca31e-49f8-4915-9457-7cb6fce7e2bd.png#align=left&display=inline&height=451&margin=%5Bobject%20Object%5D&name=image.png&originHeight=451&originWidth=606&size=15419&status=done&style=none&width=606" alt="image.png"></p>
+<ol start="6">
+<li>按 <code>F11</code>  进行安装</li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566145569493-c620fd6a-00d2-48cd-ac96-60c7880b47b3.png#align=left&display=inline&height=451&margin=%5Bobject%20Object%5D&name=image.png&originHeight=451&originWidth=606&size=15668&status=done&style=none&width=606" alt="image.png"></p>
+<ol start="7">
+<li>安装进行中</li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566145587410-27bc5785-0a92-464f-987d-68051f166aca.png#align=left&display=inline&height=450&margin=%5Bobject%20Object%5D&name=image.png&originHeight=450&originWidth=606&size=7557&status=done&style=none&width=606" alt="image.png"></p>
+<ol start="8">
+<li>安装完成并重启</li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566145602674-af1314d0-9cc7-4bfa-b66e-a858005f3f3c.png#align=left&display=inline&height=453&margin=%5Bobject%20Object%5D&name=image.png&originHeight=453&originWidth=606&size=12083&status=done&style=none&width=606" alt="image.png"></p>
+<p>到此步,我们完成 VMware ESXi 6.7.0 安装</p>
+<h5 id="附加驱动到-VMware-ESXi-安装光盘"><a href="#附加驱动到-VMware-ESXi-安装光盘" class="headerlink" title="附加驱动到 VMware ESXi  安装光盘"></a>附加驱动到 <code>VMware ESXi</code>  安装光盘</h5><p>这个算是一个题外话了.当初遇到这个问题是因为改造协会平台的时候,想要给 PC 机装上 <code>VMware ESXi</code>  然后跑虚拟机而不使用 <code>Windows Server</code>  跑虚拟机.但是安装的时候遇到了一个问题.安装过程中的报错如下:</p>
+<blockquote>
+<p>找不到当初的记录了,只能借论坛的图展示一下</p>
+</blockquote>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566146701286-e3762349-4162-47fb-8fe2-eb8eb973e3eb.png#align=left&display=inline&height=762&margin=%5Bobject%20Object%5D&name=image.png&originHeight=762&originWidth=1022&size=59146&status=done&style=none&width=1022" alt="image.png"></p>
+<p>一开始我们以为网卡出故障了,然后用 PE 分析之后,发现网卡一切正常.那么只有第二个可能,没有加载网卡驱动.<br>后面 Google 了解到,从 <code>VMware ESXi 6.0</code>  开始,官方就把以前高通的网卡驱动去除掉了,所以需要我们手动把网卡附加上去<del>(网卡是高通的,我也很想告诉你们网卡型号是什么,但是找不到记录了..)</del></p>
+<p>下面说一下添加驱动的步骤,分为离线和在线的</p>
+<blockquote>
+<p>因为当时是在服务器上操作,来不及截图,只能借用其他博客的图片了</p>
+</blockquote>
+<p>无论是在线添加驱动还是离线添加驱动,都需要进行这几个准备步骤</p>
+<h6 id="准备步骤"><a href="#准备步骤" class="headerlink" title="准备步骤"></a>准备步骤</h6><ol>
+<li>下载<a target="_blank" rel="noopener" href="https://www.powershellgallery.com/packages/VMware.PowerCLI/11.3.0.13990089">ESXI-Customizer-PS-v2.6.0.ps1</a>(后面随时会有更新,请访问<a target="_blank" rel="noopener" href="https://www.v-front.de/p/esxi-customizer-ps.html">网站</a>获取最新版本)</li>
+<li>下载并安装<a target="_blank" rel="noopener" href="https://www.powershellgallery.com/packages/VMware.PowerCLI/">VMware-PowerCLI</a>(新版采用了 PowerShell 直接安装,旧版的<a target="_blank" rel="noopener" href="http://down.whsir.com/downloads/VMware-PowerCLI-6.5.0-4624819.exe">6.5.0</a>则为 exe 安装,目前文章使用的版本为 11.3.0,获取最新版本请访问<a target="_blank" rel="noopener" href="https://www.vmware.com/go/powercli">官网</a>)<ol>
+<li>VMware-PowerCLI-11.3.0.13990089 安装过程</li>
+</ol>
+</li>
+</ol>
+<p>使用管理员权限运行 <code>Windows PowerShell</code> ,然后输入安装命令</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Install-Module</span> <span class="literal">-Name</span> VMware.PowerCLI</span><br></pre></td></tr></table></figure>
+
+<p>其中会出现两次询问,第一次为</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">是否要让PowerShellGet立即安装并导入NuGet提供程序?</span><br><span class="line">[<span class="type">Y</span>] 是  [<span class="type">N</span>] 否  [<span class="type">S</span>] 暂停 [?] 帮助: y</span><br></pre></td></tr></table></figure>
+
+<p>直接选择 <code>y</code>  即可.然后等待下载完成,进入下一步<br>第二次为</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">不受信任的存储库</span><br><span class="line">你正在从不受信任的存储库安装模块,如果你信任该储存库,请通过运行<span class="built_in">Set-PsRepository</span> cmdlet 更改其 InstallationPolicy 值,是否确实要从 <span class="string">&quot;PSGallery&quot;</span> 安装模块?</span><br><span class="line">[<span class="type">Y</span>] 是 [<span class="type">A</span>] 全是 [<span class="type">N</span>] 否 [<span class="type">L</span>] 全否 [<span class="type">S</span>] 暂停 [?] 帮助: y</span><br></pre></td></tr></table></figure>
+
+<p>直接选择 <code>y</code>  即可,然后等待下载完成,至此完成安装 <code>VMware-PowerCLI</code> <br>然后在 <code>Windows PowerShell</code>  中启动 <code>VMware-PowerCLI</code></p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Import-Module</span> VMware<span class="literal">-PowerCLI</span></span><br></pre></td></tr></table></figure>
+
+<p>如果出现以下报错</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566183414002-841a7481-1861-4dd6-aed6-c49c6c0d4c76.png#align=left&display=inline&height=133&margin=%5Bobject%20Object%5D&name=image.png&originHeight=133&originWidth=860&size=13466&status=done&style=none&width=860" alt="image.png"></p>
+<p>则对执行策略进行更改,输入命令后选择 <code>y</code>  即可</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Set-ExecutionPolicy</span> Unrestricted</span><br><span class="line">是否要更改执行策略?</span><br><span class="line">[<span class="type">Y</span>] 是 [<span class="type">A</span>] 全是 [<span class="type">N</span>] 否 [<span class="type">L</span>] 全否 [<span class="type">S</span>] 暂停 [?] 帮助: y</span><br></pre></td></tr></table></figure>
+
+<p>然后重新启动 <code>VMware-PowerCLI</code></p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Import-Module</span> VMware<span class="literal">-PowerCLI</span></span><br></pre></td></tr></table></figure>
+
+<p>即可启动,至此所有安装完成</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566183651059-b30a0f6c-83a4-4038-a50c-6a76285ee178.png#align=left&display=inline&height=237&margin=%5Bobject%20Object%5D&name=image.png&originHeight=237&originWidth=754&size=11391&status=done&style=none&width=754" alt="image.png"></p>
+<p>b. Vmware-PowerCLI 6.5.0 安装流程<br>详细流程就不进行叙述了,因为是 exe 安装,比较简单.在安装完成后,会在桌面生成一个 <code>Vmware PowerCLI</code>  的快捷方式.使用管理员权限运行即可出现以下界面</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566183651059-b30a0f6c-83a4-4038-a50c-6a76285ee178.png#align=left&display=inline&height=237&margin=%5Bobject%20Object%5D&name=image.png&originHeight=237&originWidth=754&size=11391&status=done&style=none&width=754" alt="image.png"></p>
+<p>如果运行时出现以下报错</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566183885485-45deb88c-2c3c-49f9-9af8-8814c816af72.png#align=left&display=inline&height=117&margin=%5Bobject%20Object%5D&name=image.png&originHeight=117&originWidth=841&size=11851&status=done&style=none&width=841" alt="image.png"></p>
+<p>输入命令,输入 <code>y</code>  进行确认,然后重新启动 <code>VMware-PowerCLI</code>  即可</p>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Set-ExecutionPolicy</span> Unrestricted</span><br><span class="line">是否要更改执行策略?</span><br><span class="line">[<span class="type">Y</span>] 是 [<span class="type">A</span>] 全是 [<span class="type">N</span>] 否 [<span class="type">L</span>] 全否 [<span class="type">S</span>] 暂停 [?] 帮助: y</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>(仅离线下载使用)下载网卡驱动</li>
+</ol>
+<p>访问该<a target="_blank" rel="noopener" href="https://vibsdepot.v-front.de/wiki/index.php/Welcome">网址</a>,找到你需要的驱动,进入驱动详情页后,点击 <code>Direct Download links</code>  进行下载</p>
+<ol start="4">
+<li>下载 <code>VMware ESXi</code>  文件</li>
+</ol>
+<p>如果使用在线添加驱动,请下载 <code>iso</code>  版本;如果使用离线添加驱动,请下载 <code>zip</code>  版本.这个自行去 VMware 官方下载或者服务器厂商官网下载(如 HP,DELL)即可</p>
+<ol start="5">
+<li>将 ESXI-Customizer-PS-v2.6.0.ps1,网卡驱动(如果采用离线打包),VMware ESXi 文件放置于同一个文件夹,本文中的文件夹位置为 <code>C:\VMware</code></li>
+</ol>
+<p>如果做好了以上准备,请根据自己网络情况选择在线添加驱动或离线添加驱动</p>
+<h6 id="在线添加驱动"><a href="#在线添加驱动" class="headerlink" title="在线添加驱动"></a>在线添加驱动</h6><blockquote>
+<p>当初实验的时候没有保存图片,现在借别人博客的图片来用一用<br>在线添加驱动很依赖当前网络环境,如果不能科学上网或者网络环境过差,建议使用离线添加驱动方式<del>(我当初就是等了半天都添加不了,放弃了在线添加驱动)</del></p>
+</blockquote>
+<p>当前文件夹位置: <code>C:\VMware</code> <br>文件夹包含内容: 1. ESXI-Customizer-PS-v2.6.0.ps1 2.VMwareESXi-6.0.0.iso</p>
+<ol>
+<li>启动 <code>Vmware-PowerCLI</code></li>
+</ol>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line"><span class="built_in">Import-Module</span> VMware<span class="literal">-PowerCLI</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>切换到 <code>C:\VMware</code>  目录下</li>
+<li>执行脚本,添加在线驱动到 iso 中</li>
+</ol>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">.\ESXi<span class="literal">-Customizer</span><span class="literal">-PS</span><span class="literal">-V2</span>.<span class="number">6.0</span>.ps1 <span class="literal">-v60</span> <span class="literal">-vft</span> <span class="literal">-load</span> net<span class="literal">-atl1e</span></span><br></pre></td></tr></table></figure>
+
+<p>参数说明: <code>-v60</code>  的是 6.0.0 版本的 ESXi iso; <code>net-atl1e</code>  指的是网卡驱动,具体的网卡驱动名字请访问<a target="_blank" rel="noopener" href="https://vibsdepot.v-front.de/wiki/index.php/List_of_currently_available_ESXi_packages">此网站</a>进行查找; <code>-vft</code>  指连接到在线仓库</p>
+<ol start="4">
+<li>完成封装</li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566186680331-f051865e-62e5-4f9d-80d3-98b895a33463.png#align=left&display=inline&height=490&margin=%5Bobject%20Object%5D&name=image.png&originHeight=490&originWidth=677&size=63483&status=done&style=none&width=677" alt="image.png"></p>
+<p>注: 1.执行脚本时,windows 可能提示不信任脚本,是否继续运行.此时只需要输入 R(运行一次即可继续)</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566186746500-df2cdb06-e7ab-4883-b70d-0869b9d4f43f.png#align=left&display=inline&height=442&margin=%5Bobject%20Object%5D&name=image.png&originHeight=442&originWidth=677&size=59052&status=done&style=none&width=677" alt="image.png"></p>
+<ol start="2">
+<li>如果出现 FATAL ERROR: Canot add the V-Front Online depot. Please check your internet connectivity and/or proxy settings!,那么是你的网络有问题,建议开启代理或者换一个好的网络环境</li>
+</ol>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566193304370-cf1a9d0a-112d-4597-af81-84203f36d26b.png#align=left&display=inline&height=276&margin=%5Bobject%20Object%5D&name=image.png&originHeight=276&originWidth=640&size=18683&status=done&style=none&width=640" alt="image.png"></p>
+<h6 id="离线添加驱动"><a href="#离线添加驱动" class="headerlink" title="离线添加驱动"></a>离线添加驱动</h6><blockquote>
+<p>如果网络不佳,强烈建议使用此方式封装,唯一缺点就是需要提前下载好驱动</p>
+</blockquote>
+<p>当前文件夹位置: <code>C:\VMware</code> <br>文件夹包含内容: 1. ESXI-Customizer-PS-v2.6.0.ps1 2.VMwareESXi-6.0.0.zip 3. net-atl1e-1.0.1.14-1-offline_bundle.zip</p>
+<ol>
+<li>解压 <code>net-atl1e-1.0.1.14-1-offline_bundle.zip</code> ,得到 <code>net-atl1e-1.0.1.14-1.x86_64.vib</code> .</li>
+<li>创建一个 <code>driver</code>  文件夹,然后把 <code>net-atl1e-1.0.1.14-1.x86_64.vib</code> .放置于此文件夹中</li>
+<li>执行命令打包驱动(打包时会自动在当前文件夹的 <code>driver</code>  文件夹内查找 <code>vib</code>  驱动,在当前目录生成 <code>VMwareESXi-6.0.0.iso</code>  文件)</li>
+</ol>
+<figure class="highlight powershell"><table><tr><td class="code"><pre><span class="line">.\ESXi<span class="literal">-Customizer</span><span class="literal">-PS</span><span class="literal">-v2</span>.<span class="number">6.0</span>.ps1 <span class="literal">-izip</span> .\VMwareESXi<span class="literal">-6</span>.<span class="number">0.0</span>.zip <span class="literal">-pkgDir</span> c:\VMware\driver\</span><br></pre></td></tr></table></figure>
+
+<p>如果一切正常,会出现以下内容</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566217025243-0de8705e-ea3a-4a03-b165-ff719b60b4c0.png#align=left&display=inline&height=613&margin=%5Bobject%20Object%5D&name=image.png&originHeight=613&originWidth=658&size=37457&status=done&style=none&width=658" alt="image.png"></p>
+<p>All done 后,表示封包完成,将镜像写入 U 盘即可</p>
+<h5 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h5><p><img src="https://cdn.nlark.com/yuque/0/2019/png/242695/1566218706371-90751d37-62a7-491f-89b5-d12c0021067a.png#align=left&display=inline&height=80&margin=%5Bobject%20Object%5D&name=image.png&originHeight=80&originWidth=400&size=6563&status=done&style=none&width=400" alt="image.png"></p>
+<p>看了一下<a target="_blank" rel="noopener" href="https://www.v-front.de/">VMware Front Experiend</a>,好像现在他们出了一个<a target="_blank" rel="noopener" href="https://www.v-front.de/p/esxi-community-packaging-tools.html">GUI 工具</a>,也可以添加驱动.没尝试过,下次有机会再尝试一下.</p>
+<p>如果文章有不正确的地方,欢迎指出.</p>
+</div><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="mailto:undefined">gorquan</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://blog.gorquan.cn/2019/08/01/yuque/Vmware%20Esxi%206.7.0%20%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2/">http://blog.gorquan.cn/2019/08/01/yuque/Vmware Esxi 6.7.0 安装部署/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://blog.gorquan.cn" target="_blank">gorquan's Blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Linux/">Linux</a><a class="post-meta__tags" href="/tags/Esxi/">Esxi</a></div><div class="post_share"><div class="social-share" data-image="https://gorquan-blogs-picture-1251930375.cos.ap-guangzhou.myqcloud.com/background.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js/dist/css/share.min.css"/><script src="https://cdn.jsdelivr.net/npm/social-share.js/dist/js/social-share.min.js"></script></div></div><nav class="pagination_post" id="pagination"><div class="prev-post pull_left"><a href="/2019/08/13/yuque/luci%20debug/"><img class="prev_cover" src="https://gorquan-blogs-picture-1251930375.cos.ap-guangzhou.myqcloud.com/lua.jpg" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">luci debug</div></div></a></div><div class="next-post pull_right"><a href="/2019/08/01/yuque/Requests%E6%A8%A1%E5%9D%97%E4%BD%BF%E7%94%A8I%20%E8%8E%B7%E5%8F%96%E7%9F%AD%E9%93%BE%E6%8E%A5%E7%9C%9F%E5%AE%9E%E5%9C%B0%E5%9D%80/"><img class="next_cover" src="https://gorquan-blogs-picture-1251930375.cos.ap-guangzhou.myqcloud.com/python.png" onerror="onerror=null;src='/img/404.jpg'"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">Requests模块使用I 获取短链接真实地址</div></div></a></div></nav><div class="relatedPosts"><div class="relatedPosts_headline"><i class="fa fa-fw fa-thumbs-up" aria-hidden="true"></i><span> 相关推荐</span></div><div class="relatedPosts_list"><div class="relatedPosts_item"><a href="/2020/08/21/yuque/Linux故障系列：3. 置空与rm操作/" title="Linux故障系列：3. 置空与rm操作"><img class="relatedPosts_cover" src="https://gorquan-blogs-picture-1251930375.cos.ap-guangzhou.myqcloud.com/linux.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-08-22</div><div class="relatedPosts_title">Linux故障系列：3. 置空与rm操作</div></div></a></div><div class="relatedPosts_item"><a href="/2020/08/01/yuque/Linux故障系列：2.记一次磁盘空间不足排查过程/" title="Linux故障系列：2.记一次磁盘空间不足排查过程"><img class="relatedPosts_cover" src="https://gorquan-blogs-picture-1251930375.cos.ap-guangzhou.myqcloud.com/linux.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-08-01</div><div class="relatedPosts_title">Linux故障系列：2.记一次磁盘空间不足排查过程</div></div></a></div><div class="relatedPosts_item"><a href="/2020/08/01/yuque/Linux故障系列：1. 开篇/" title="Linux故障系列：1. 开篇"><img class="relatedPosts_cover" src="https://gorquan-blogs-picture-1251930375.cos.ap-guangzhou.myqcloud.com/linux.jpg"><div class="relatedPosts_main is-center"><div class="relatedPosts_date"><i class="fa fa-calendar fa-fw" aria-hidden="true"></i> 2020-08-01</div><div class="relatedPosts_title">Linux故障系列：1. 开篇</div></div></a></div></div><div class="clear_both"></div></div><hr><div id="post-comment"><div class="comment_headling"><i class="fa fa-comments fa-fw" aria-hidden="true"></i><span> 评论</span></div><div class="vcomment" id="vcomment"></div><script src="https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js"></script><script>var requestSetting = function (from,set) {
+  var from = from
+  var setting = set.split(',').filter(function(item){
+  return from.indexOf(item) > -1
+  });
+  setting = setting.length == 0 ? from :setting;
+  return setting
+}
+
+var guestInfo = requestSetting(['nick','mail','link'],'nick,mail')
+var requiredFields = requestSetting(['nick','mail','link'],'nick,mail')
+
+window.valine = new Valine({
+  el:'#vcomment',
+  appId: 'kxRUuoaHvxEKroNzfsxFskpF-gzGzoHsz',
+  appKey: 'tXmjvxCxGHKlOjzQMRSvH2cq',
+  notify: false,
+  verify: false,
+  placeholder: '欢迎留下留言，评论要遵守法律法规哦～',
+  avatar: 'monsterid',
+  meta: guestInfo,
+  pageSize: '10',
+  lang: 'zh-CN',
+  recordIP: false,
+  serverURLs: '',
+  emojiCDN: '',
+  emojiMaps: "",
+  enableQQ: false,
+  requiredFields: requiredFields
+});</script></div></article></main><footer id="footer" style="background-image: url(https://gorquan-blogs-picture-1251930375.cos.ap-guangzhou.myqcloud.com/vmw.png)" data-type="photo"><div id="footer-wrap"><div class="copyright">&copy;2019 - 2021 By gorquan</div><div class="framework-info"><span>驱动 </span><a target="_blank" rel="noopener" href="https://hexo.io"><span>Hexo</span></a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly"><span>Butterfly</span></a></div></div></footer></div><section class="rightside" id="rightside"><div id="rightside-config-hide"><i class="fa fa-book" id="readmode" title="阅读模式"></i><i class="fa fa-plus" id="font_plus" title="放大字体"></i><i class="fa fa-minus" id="font_minus" title="缩小字体"></i><a class="translate_chn_to_cht" id="translateLink" href="javascript:translatePage();" title="简繁转换" target="_self">繁</a><i class="darkmode fa fa-moon-o" id="darkmode" title="夜间模式"></i></div><div id="rightside-config-show"><div id="rightside_config" title="设置"><i class="fa fa-cog" aria-hidden="true"></i></div><a id="to_comment" href="#post-comment" title="直达评论"><i class="scroll_to_comment fa fa-comments">  </i></a><i class="fa fa-list-ul close" id="mobile-toc-button" title="目录" aria-hidden="true"></i><i class="fa fa-arrow-up" id="go-up" title="回到顶部" aria-hidden="true"></i></div></section><script src="https://cdn.jsdelivr.net/npm/jquery@latest/dist/jquery.min.js"></script><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@latest/dist/jquery.fancybox.min.js"></script><script src="https://cdn.jsdelivr.net/npm/animejs@latest/anime.min.js"></script><script src="/js/third-party/fireworks.js"></script><script src="https://cdn.jsdelivr.net/npm/node-snackbar/dist/snackbar.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page@latest/instantpage.min.js" type="module"></script><script>var endLoading = function () {
+  document.body.style.overflow = 'auto';
+  document.getElementById('loading-box').classList.add("loaded")
+}
+window.addEventListener('load',endLoading)</script></body></html>
